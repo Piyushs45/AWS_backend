@@ -143,8 +143,9 @@ export class ProductServiceStack extends cdk.Stack {
     }));
     getProductById.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:Scan'],
+      actions: ['dynamodb:Scan', 'dynamodb:GetItem'],
       resources: ['arn:aws:dynamodb:us-east-1:256443123887:table/ProductsTable', 'arn:aws:dynamodb:us-east-1:256443123887:table/StockTable'],
     }));
+    
   }
 }

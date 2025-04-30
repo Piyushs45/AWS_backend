@@ -8,15 +8,26 @@ const STOCK_TABLE = 'StockTable';
 
 export const handler = async (event: any) => {
   try {
-    const { productId } = event.pathParameters;
+    if (!event.pathParameters || !event.pathParameters.productId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Missing productId in path' }),
+      };
+    }
 
-    // Get product by ID
+    const { productId } = event.pathParameters;
+    const productKey = String(productId);
+
+    console.log("Fetching product with id:", productKey);
+
     const productResult = await client.send(
       new GetCommand({
         TableName: PRODUCTS_TABLE,
-        Key: { id: productId },
+        Key: { id: productKey },
       })
     );
+
+    console.log("Product result:", productResult);
 
     if (!productResult.Item) {
       return {
@@ -25,13 +36,14 @@ export const handler = async (event: any) => {
       };
     }
 
-    // Get stock by product_id
     const stockResult = await client.send(
       new GetCommand({
         TableName: STOCK_TABLE,
-        Key: { product_id: productId },
+        Key: { product_id: productKey },
       })
     );
+
+    console.log("Stock result:", stockResult);
 
     const count = stockResult.Item?.count ?? 0;
 
